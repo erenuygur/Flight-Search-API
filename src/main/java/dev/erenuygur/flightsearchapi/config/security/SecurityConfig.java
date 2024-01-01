@@ -2,6 +2,7 @@ package dev.erenuygur.flightsearchapi.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,10 +20,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/api/secure/**", "/swagger-ui/**").authenticated()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/**").permitAll()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults())
+                .csrf().disable()
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
@@ -33,7 +39,7 @@ public class SecurityConfig {
         UserDetails userDetails = User.withDefaultPasswordEncoder()
                 .username("admin")
                 .password("admin")
-                .roles("USER")
+                .roles("ADMIN")
                 .build();
 
         return new InMemoryUserDetailsManager(userDetails);

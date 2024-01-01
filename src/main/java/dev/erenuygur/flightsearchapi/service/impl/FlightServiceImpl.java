@@ -1,11 +1,12 @@
 package dev.erenuygur.flightsearchapi.service.impl;
 
+import dev.erenuygur.flightsearchapi.exception.AirportNotFoundException;
 import dev.erenuygur.flightsearchapi.model.dto.FlightResponseDTO;
+import dev.erenuygur.flightsearchapi.model.entity.Airport;
 import dev.erenuygur.flightsearchapi.model.entity.Flight;
 import dev.erenuygur.flightsearchapi.repository.AirportRepository;
 import dev.erenuygur.flightsearchapi.repository.FlightRepository;
 import dev.erenuygur.flightsearchapi.service.FlightService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +42,15 @@ public class FlightServiceImpl implements FlightService {
     }
 
     public FlightResponseDTO convertToDTO(Flight flight) {
-        String departureAirportCity = airportRepository.getById(flight.getDepartureAirportId()).getCity();
-        String arrivalAirportCity = airportRepository.getById(flight.getArrivalAirportId()).getCity();
+
+        Airport departureAirport = airportRepository.findById(flight.getDepartureAirportId())
+                .orElseThrow(AirportNotFoundException::new);
+
+        Airport arrivalAirport = airportRepository.findById(flight.getArrivalAirportId())
+                .orElseThrow(AirportNotFoundException::new);
+
+        String departureAirportCity = departureAirport.getCity();
+        String arrivalAirportCity = arrivalAirport.getCity();
 
         FlightResponseDTO flightResponseDTO = new FlightResponseDTO();
         flightResponseDTO.setArrivalCity(arrivalAirportCity);
@@ -54,13 +62,11 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    @Transactional
     public Flight createFlight(Flight flight) {
         return flightRepository.save(flight);
     }
 
     @Override
-    @Transactional
     public void deleteFlight(Long id) {
         flightRepository.deleteById(id);
     }
@@ -89,7 +95,6 @@ public class FlightServiceImpl implements FlightService {
     }
 
     @Override
-    @Transactional
     public Flight updateFlight(Long id, Flight flight) {
         if (flightRepository.existsById(id)) {
             flight.setId(id);
