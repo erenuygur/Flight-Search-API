@@ -55,7 +55,7 @@ Database Configuration: Configure the database connection details in the applica
 
 Once the application is running, you can access the API documentation at http://localhost:8080/swagger-ui.html.
 
-![Swagger](/content/SwaggerDoc.png "End Points").
+![Swagger](/content/SwaggerDoc.PNG "End Points").
 
 
 
