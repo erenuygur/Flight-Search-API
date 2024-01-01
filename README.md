@@ -18,6 +18,7 @@ To run the project on your local machine, follow the steps below.
 
 - Java 17
 - Maven
+- PostgreSQL
 
 ### Installation
 
